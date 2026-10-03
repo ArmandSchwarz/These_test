@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Experiments from Armand Schwarz’s thesis: audio examples and interactive demonstrations.">
+  <title>Thesis experiments · Armand Schwarz</title>
+  <style>
+    :root { --ink: #18352f; --muted: #626e68; --paper: #f8f7f2; --line: #dce2d9; --accent: #27715c; }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 105px; }
+    body { margin: 0; background: var(--paper); color: var(--ink); font: 17px/1.7 system-ui, sans-serif; }
+    a { color: inherit; }
+    a:focus-visible { outline: 3px solid #b66d28; outline-offset: 5px; }
+    .skip { position: fixed; left: 16px; top: -100px; z-index: 10; background: white; padding: 10px; }
+    .skip:focus { top: 12px; }
+    header { position: sticky; top: 0; z-index: 5; background: #f8f7f2f5; border-bottom: 1px solid var(--line); }
+    .nav { max-width: 1120px; margin: auto; padding: 17px 28px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+    .brand { text-decoration: none; font-weight: 650; font-size: 15px; white-space: nowrap; }
+    nav { display: flex; gap: 23px; flex-wrap: wrap; }
+    nav a { font-size: 14px; text-decoration: none; color: var(--muted); }
+    nav a:hover { color: var(--accent); text-decoration: underline; text-underline-offset: 5px; }
+    main { max-width: 1120px; margin: auto; padding: 0 28px; }
+    .intro { padding: 75px 0 65px; }
+    .eyebrow { margin: 0 0 17px; color: var(--accent); font-size: 12px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; }
+    h1, h2 { font-family: Georgia, serif; font-weight: 400; line-height: 1.15; }
+    h1 { font-size: clamp(38px, 6vw, 67px); max-width: 800px; margin: 0 0 25px; letter-spacing: -.035em; }
+    .lead { max-width: 720px; font-size: 19px; color: var(--muted); }
+    .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 42px; }
+    .card { display: flex; flex-direction: column; padding: 25px; border: 1px solid var(--line); border-radius: 14px; text-decoration: none; background: white; transition: transform .2s, border-color .2s; }
+    .card:hover { transform: translateY(-4px); border-color: var(--accent); }
+    .number { color: var(--accent); font-size: 13px; font-weight: 600; }
+    .card h3 { font-size: 20px; line-height: 1.35; font-weight: 600; margin: 16px 0 10px; }
+    .card p { font-size: 15px; color: var(--muted); margin: 0 0 22px; }
+    .card .link { margin-top: auto; font-size: 14px; color: var(--accent); }
+    .experiment { padding: 62px 0 68px; border-top: 1px solid var(--line); }
+    h2 { font-size: clamp(30px, 4vw, 43px); margin: 0 0 20px; letter-spacing: -.025em; }
+    .description { max-width: 720px; color: var(--muted); }
+    .placeholder { margin-top: 30px; padding: 28px 30px; border-radius: 12px; background: #edf1e9; border: 1px dashed #c5d1c0; }
+    .placeholder strong { display: block; font-size: 15px; font-weight: 600; }
+    .placeholder p { margin: 6px 0 0; color: var(--muted); font-size: 15px; }
+    .back { display: inline-block; margin-top: 24px; font-size: 14px; color: var(--accent); text-underline-offset: 4px; }
+    footer { max-width: 1120px; margin: auto; padding: 28px; border-top: 1px solid var(--line); font-size: 13px; color: var(--muted); display: flex; justify-content: space-between; gap: 15px; }
+    @media (max-width: 760px) {
+      .nav { align-items: flex-start; flex-direction: column; gap: 9px; padding: 12px 20px; }
+      nav { gap: 10px 18px; }
+      nav a { font-size: 13px; }
+      main { padding: 0 20px; }
+      .intro { padding-top: 44px; }
+      .cards { grid-template-columns: 1fr; }
+      .card { padding: 20px; }
+      .experiment { padding: 44px 0; }
+      footer { flex-direction: column; padding: 24px 20px; }
+      html { scroll-padding-top: 140px; }
+    }
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .card { transition: none; } }
+
+    .subnav { display: flex; gap: 12px; margin: 26px 0 36px; flex-wrap: wrap; }
+    .subnav a { padding: 8px 19px; background: white; border: 1px solid var(--line); border-radius: 24px; text-decoration: none; font-size: 15px; }
+    .subnav a:hover { border-color: var(--accent); color: var(--accent); }
+    .subsection { padding-top: 28px; }
+    .subsection + .subsection { margin-top: 45px; border-top: 1px solid var(--line); }
+    .subsection > h3 { font-family: Georgia, serif; font-size: 31px; font-weight: 400; margin: 0 0 15px; }
+    h4 { font-size: 19px; font-weight: 600; margin: 28px 0 10px; }
+    figure { margin: 22px 0 38px; max-width: 850px; }
+    figure img { display: block; width: 100%; height: auto; border: 1px solid var(--line); border-radius: 12px; background: white; }
+    figcaption { font-size: 14px; color: var(--muted); margin-top: 10px; }
+    .audio-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 13px; margin-top: 24px; }
+    .sound { display: flex; gap: 18px; align-items: center; padding: 18px 20px; background: white; border: 1px solid var(--line); border-radius: 12px; }
+    .sound h5 { min-width: 37px; margin: 0; font-size: 17px; font-weight: 600; }
+    audio { width: 100%; min-width: 0; height: 40px; }
+    .media-message { padding: 20px; color: var(--muted); border: 1px dashed var(--line); border-radius: 12px; font-size: 14px; }
+    @media (max-width: 760px) { .audio-grid { grid-template-columns: 1fr; } .sound { padding: 14px; gap: 10px; } }
+  </style>
+</head>
+<body>
+  <a class="skip" href="#contenu">Skip to content</a>
+  <header>
+    <div class="nav">
+      <a class="brand" href="#introduction">Armand Schwarz · Thesis</a>
+      <nav aria-label="Page sections">
+        <a href="#introduction">Introduction</a>
+        <a href="#sonie-timbre">Loudness and timbre</a>
+        <a href="#multi-flux">Two-stream attention</a>
+        <a href="#local-global">Local-global</a>
+      </nav>
+    </div>
+  </header>
+  <main id="contenu">
+    <section class="intro" id="introduction" aria-labelledby="titre-introduction">
+      <p class="eyebrow">Audio examples and interactive demonstrations</p>
+      <h1 id="titre-introduction">Listen to and explore<br>the thesis experiments</h1>
+      <p class="lead">This page accompanies the thesis with audio examples, task instructions, and illustrations from its three experimental parts.</p>
+      <p class="description">Choose an experiment to go directly to its section.</p>
+      <div class="cards">
+        <a class="card" href="#sonie-timbre">
+          <span class="number">01</span>
+          <h3>Loudness and timbre</h3>
+          <p>Explore the sounds used in the loudness and timbre experiments.</p>
+          <span class="link">Explore this section →</span>
+        </a>
+        <a class="card" href="#multi-flux">
+          <span class="number">02</span>
+          <h3>Attention in two sound streams</h3>
+          <p>Discover the detection task and the distracting events.</p>
+          <span class="link">Explore this section →</span>
+        </a>
+        <a class="card" href="#local-global">
+          <span class="number">03</span>
+          <h3>Local-global processing</h3>
+          <p>Listen to the pitch patterns and explore their structure.</p>
+          <span class="link">Explore this section →</span>
+        </a>
+      </div>
+    </section>
+    <section class="experiment" id="sonie-timbre" aria-labelledby="titre-sonie">
+      <p class="eyebrow">Experimental part 01</p>
+      <h2 id="titre-sonie">Loudness and timbre</h2>
+      <p class="description">This section brings together two experiments investigating loudness and timbre perception. Explore the loudness experiment below, or jump to the timbre experiment.</p>
+      <nav class="subnav" aria-label="Loudness and timbre experiments">
+        <a href="#loudness">Loudness experiment</a>
+        <a href="#timbre">Timbre experiment</a>
+      </nav>
+      <section class="subsection" id="loudness" aria-labelledby="title-loudness">
+        <h3 id="title-loudness">Loudness experiment</h3>
+        <p class="description">In this experiment, listeners rated the perceived loudness of sounds presented at different levels. The response interface and the 14 seed sounds are provided below to illustrate the task and its stimuli.</p>
+        <h4>Response interface</h4>
+        <p class="description">The screenshot below shows the interface used to collect participants’ loudness ratings.</p>
+        <figure>
+          <img src="Sonie_et_timbre/Sonie/Interface_reponse.png" alt="Response interface used in the loudness experiment" loading="lazy" id="loudness-interface">
+          <p class="media-message" id="interface-unavailable" hidden>The response interface image will appear here when the experimental materials are added.</p>
+          <figcaption>Response interface for the loudness experiment.</figcaption>
+        </figure>
+        <h4>Listen to the seed sounds</h4>
+        <p class="description">Listen to each of the 14 seed sounds using the players below. The labels B1–B6, R1–R6, and FX1–FX2 match those used in the thesis chapter.</p>
+        <div class="audio-grid">
+            <div class="sound">
+              <h5 id="sound-0">B1</h5>
+              <audio controls preload="none" aria-labelledby="sound-0">
+                <source src="Sonie_et_timbre/Sonie/son_graine/son_0.wav" type="audio/wav">
+                Your browser does not support audio playback.
+              </audio>
+            </div>
+            <div class="sound">
+              <h5 id="sound-1">B2</h5>
+              <audio controls preload="none" aria-labelledby="sound-1">
+                <source src="Sonie_et_timbre/Sonie/son_graine/son_1.wav" type="audio/wav">
+                Your browser does not support audio playback.
+              </audio>
+            </div>
+            <div class="sound">
+              <h5 id="sound-2">B3</h5>
+              <audio controls preload="none" aria-labelledby="sound-2">
+                <source src="Sonie_et_timbre/Sonie/son_graine/son_2.wav" type="audio/wav">
+                Your browser does not support audio playback.
+              </audio>
+            </div>
+            <div class="sound">
+              <h5 id="sound-3">B4</h5>
+              <audio controls preload="none" aria-labelledby="sound-3">
+                <source src="Sonie_et_timbre/Sonie/son_graine/son_3.wav" type="audio/wav">
+                Your browser does not support audio playback.
+              </audio>
+            </div>
+            <div class="sound">
+              <h5 id="sound-4">B5</h5>
+              <audio controls preload="none" aria-labelledby="sound-4">
+                <source src="Sonie_et_timbre/Sonie/son_graine/son_4.wav" type="audio/wav">
+                Your browser does not support audio playback.
+              </audio>
+            </div>
+            <div class="sound">
+              <h5 id="sound-5">B6</h5>
+              <audio controls preload="none" aria-labelledby="sound-5">
+                <source src="Sonie_et_timbre/Sonie/son_graine/son_5.wav" type="audio/wav">
+                Your browser does not support audio playback.
+              </audio>
+            </div>
+            <div class="sound">
+              <h5 id="sound-6">R1</h5>
+              <audio controls preload="none" aria-labelledby="sound-6">
+                <source src="Sonie_et_timbre/Sonie/son_graine/son_6.wav" type="audio/wav">
+                Your browser does not support audio playback.
+              </audio>
+            </div>
+            <div class="sound">
+              <h5 id="sound-7">R2</h5>
+              <audio controls preload="none" aria-labelledby="sound-7">
+                <source src="Sonie_et_timbre/Sonie/son_graine/son_7.wav" type="audio/wav">
+                Your browser does not support audio playback.
+              </audio>
+            </div>
+            <div class="sound">
+              <h5 id="sound-8">R3</h5>
+              <audio controls preload="none" aria-labelledby="sound-8">
+                <source src="Sonie_et_timbre/Sonie/son_graine/son_8.wav" type="audio/wav">
+                Your browser does not support audio playback.
+              </audio>
+            </div>
+            <div class="sound">
+              <h5 id="sound-9">R4</h5>
+              <audio controls preload="none" aria-labelledby="sound-9">
+                <source src="Sonie_et_timbre/Sonie/son_graine/son_9.wav" type="audio/wav">
+                Your browser does not support audio playback.
+              </audio>
+            </div>
+            <div class="sound">
+              <h5 id="sound-10">R5</h5>
+              <audio controls preload="none" aria-labelledby="sound-10">
+                <source src="Sonie_et_timbre/Sonie/son_graine/son_10.wav" type="audio/wav">
+                Your browser does not support audio playback.
+              </audio>
+            </div>
+            <div class="sound">
+              <h5 id="sound-11">R6</h5>
+              <audio controls preload="none" aria-labelledby="sound-11">
+                <source src="Sonie_et_timbre/Sonie/son_graine/son_11.wav" type="audio/wav">
+                Your browser does not support audio playback.
+              </audio>
+            </div>
+            <div class="sound">
+              <h5 id="sound-12">FX1</h5>
+              <audio controls preload="none" aria-labelledby="sound-12">
+                <source src="Sonie_et_timbre/Sonie/son_graine/son_12.wav" type="audio/wav">
+                Your browser does not support audio playback.
+              </audio>
+            </div>
+            <div class="sound">
+              <h5 id="sound-13">FX2</h5>
+              <audio controls preload="none" aria-labelledby="sound-13">
+                <source src="Sonie_et_timbre/Sonie/son_graine/son_13.wav" type="audio/wav">
+                Your browser does not support audio playback.
+              </audio>
+            </div>
+        </div>
+      </section>
+      <section class="subsection" id="timbre" aria-labelledby="title-timbre">
+        <h3 id="title-timbre">Timbre experiment</h3>
+        <p class="description">This experiment investigated how listeners perceived differences in timbre between sounds.</p>
+        <div class="placeholder"><strong>Coming soon</strong><p>Task instructions, audio examples, and illustrations will be added here.</p></div>
+      </section>
+      <a class="back" href="#introduction">↑ Back to introduction</a>
+    </section>
+    <section class="experiment" id="multi-flux" aria-labelledby="titre-multi">
+      <p class="eyebrow">Experimental part 02</p>
+      <h2 id="titre-multi">Attention in two sound streams</h2>
+      <p class="description">This section will introduce the selective attention task: detecting targets in one sound stream while ignoring a second stream.</p>
+      <div class="placeholder"><strong>Coming soon</strong><p>Task instructions, audio examples, and an interactive demonstration: press the space bar to respond, then view your score.</p></div>
+      <a class="back" href="#introduction">↑ Back to introduction</a>
+    </section>
+    <section class="experiment" id="local-global" aria-labelledby="titre-local">
+      <p class="eyebrow">Experimental part 03</p>
+      <h2 id="titre-local">Local-global processing</h2>
+      <p class="description">This section will introduce the pitch patterns used to investigate the processing of local changes and global structure.</p>
+      <div class="placeholder"><strong>Coming soon</strong><p>Task instructions and audio examples, with answers and spectrograms that can be revealed after listening.</p></div>
+      <a class="back" href="#introduction">↑ Back to introduction</a>
+    </section>
+  </main>
+  <footer><span>Armand Schwarz · Thesis companion</span><span>Audio examples and experimental materials</span></footer>
+  <script>
+    // Keep the page readable before the image file has been supplied.
+    const interfaceImage = document.getElementById('loudness-interface');
+    function showImagePlaceholder() {
+      interfaceImage.hidden = true;
+      interfaceImage.style.display = 'none';
+      document.getElementById('interface-unavailable').hidden = false;
+    }
+    interfaceImage.addEventListener('error', showImagePlaceholder);
+    if (interfaceImage.complete && interfaceImage.naturalWidth === 0) showImagePlaceholder();
+    // Playing a new example pauses any other example currently playing.
+    document.querySelectorAll('audio').forEach(player => {
+      player.addEventListener('play', () => {
+        document.querySelectorAll('audio').forEach(other => {
+          if (other !== player) other.pause();
+        });
+      });
+    });
+  </script>
+</body>
+</html>
